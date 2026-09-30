@@ -1,0 +1,12 @@
+# Fichiers de verrouillage
+.~lock.*#
+
+# Environnements virtuels
+venv/
+.env
+
+#Fichiers systeme
+.DS_Store
+
+#Autre
+todo.md
