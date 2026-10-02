@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "parser.h"
 
 
 char *get_line(FILE *fp, char *buffer, size_t size) {
