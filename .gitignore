@@ -12,6 +12,3 @@ venv/
 
 #Fichiers systeme
 .DS_Store
-
-#Autre
-todo.md
