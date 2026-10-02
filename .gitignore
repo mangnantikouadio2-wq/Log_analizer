@@ -1,3 +1,8 @@
+# Binaires
+parser
+*.o
+*.out
+a.out
 # Fichiers de verrouillage
 .~lock.*#
 
