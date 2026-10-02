@@ -4,13 +4,10 @@
 
 int parse_line(const char *line, LogEntity *entry) {
     int state = OUT;
-    fprintf(stderr, "[p] entrée: <<%s>>\n", line);
     get_ip(&line, entry->ip);
-    fprintf(stderr, "[p] après get_ip: ip='%s' | reste='%.30s'\n", entry->ip, line);
     while (*line == ' ' || *line == '-') {
         line++;
     }
-    fprintf(stderr, "[p] après skip: '%c' (0x%02x)\n", *line ? *line : '?', (unsigned char)*line);
     if (*line++ == '[') {
         state = IN_BRACKETS;
         line++;
@@ -25,7 +22,6 @@ int parse_line(const char *line, LogEntity *entry) {
             state = OUT;
         }
     } else {
-        fprintf(stderr, "[p] ECHEC: pas de '['\n");
         return 0;
     }
     while(*line == ' ') {
@@ -46,7 +42,6 @@ int parse_line(const char *line, LogEntity *entry) {
             state = OUT;
         }
     } else {
-        fprintf(stderr, "[p] ECHEC: pas de '\"'\n");
         return 0;
     }
     while(*line && (*line < '0' || *line > '9')) {
