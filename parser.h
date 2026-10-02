@@ -19,6 +19,11 @@ int status;
 } LogEntity;
 
 char *get_line(FILE *fp, char *buffer, size_t size);
+int get_status(const char *buffer);
+int get_ip(const char **buffer, char *IP);
+int get_timestamp(const char **buffer, char *timestamp);
+int get_method(const char **buffer, char *method);
+int get_link(const char **buffer, char *URL);
 int parse_line(const char *line, LogEntity *entry);
 
 #endif
