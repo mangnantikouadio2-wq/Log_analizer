@@ -3,7 +3,7 @@
 #include <string.h>
 #include "parser.h"
 
-int validate_ip(char *ip) {
+int validate_ip(const char *ip) {
    int octets = 0;
    int value = 0;
    int digits = 0;
@@ -36,7 +36,7 @@ int validate_ip(char *ip) {
    return (octets == 4);
 }
 
-int validate_timestamp(char *timestamp) {
+int validate_timestamp(const char *timestamp) {
     if (!is_valid_day(timestamp)) {
         return 0;
     }
@@ -110,4 +110,17 @@ static int is_valid_time(const char *time) {
         return 0;
     }
     return 1;
+}
+
+int validate_method(const char *method) {
+    for (int c=0; method[c] != '\0'; c++) {
+        if (!isalpha((unsigned char)method[c])) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int validate_url(const char *link) {
+    return (link[0] == '/' && link[1] != '\0');
 }
