@@ -37,7 +37,19 @@ int validate_ip(char *ip) {
 }
 
 int validate_timestamp(char *timestamp) {
-    
+    if (!is_valid_day(timestamp)) {
+        return 0;
+    }
+    if (!is_valid_month(timestamp + 3)) {
+        return 0;
+    }
+    if (!is_valid_year(timestamp + 7)) {
+        return 0;
+    }
+    if (!is_valid_time(timestamp + 12)) {
+        return 0;
+    }
+    return 1;
 }
 
 static int is_valid_day(const char *day) {
@@ -75,8 +87,8 @@ static int is_valid_year(const char *year) {
 
 static int is_two_digits(const char *s, int min, int max) {
     if (!isdigit((unsigned char)s[0]) || !isdigit((unsigned char)s[1])) {
-        return 0.
-    }
+        return 0;
+    };
     int d = (s[0] - '0') * 10 + (s[0] - '0');
     return d>=min && d<=max;
 }
