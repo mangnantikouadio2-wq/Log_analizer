@@ -122,5 +122,20 @@ int validate_method(const char *method) {
 }
 
 int validate_url(const char *link) {
-    return (link[0] == '/' && link[1] != '\0');
+    if (link[0] != '/') {
+        return 0;
+    }
+    for (const char *p = link; *p; p++) {
+        unsigned char c = (unsigned char)*p;
+        if (c <= 0x20 || c == 0x7F) {
+            return 0;
+        }
+        if (c == '"') {
+            return 0;
+        }
+        if (c == '<' || c == '>' || c == '\\') {
+            return 0;
+        }
+    }
+    return 1;
 }
