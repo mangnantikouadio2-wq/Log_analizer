@@ -41,14 +41,13 @@ int validate_timestamp(char *timestamp) {
 }
 
 static int is_valid_day(const char *day) {
-    if (!isdigit((unsigned char)day[0]) || !isdigit((unsigned char)day[1])) {
+    if (!is_two_digits(day, 1, 31)) {
         return 0;
     }
     if (day[2] != '/') {
         return 0;
     }
-    int d = (day[0] - '0') * 10 + (day[1] - '0');
-    return d>=1 && d<=31;
+    return 1;
 }
 
 static int is_valid_month(const char *month) {
@@ -69,6 +68,33 @@ static int is_valid_year(const char *year) {
         }
     }
     if (year[4] != ':') {
+        return 0;
+    }
+    return 1;
+}
+
+static int is_two_digits(const char *s, int min, int max) {
+    if (!isdigit((unsigned char)s[0]) || !isdigit((unsigned char)s[1])) {
+        return 0.
+    }
+    int d = (s[0] - '0') * 10 + (s[0] - '0');
+    return d>=min && d<=max;
+}
+
+static int is_valid_time(const char *time) {
+    if (!is_two_digits(time, 0, 23)) {
+        return 0;
+    }
+    if (time[2] != ':') {
+        return 0;
+    }
+    if (!is_two_digits(time + 3, 0, 59)) {
+        return 0;
+    }
+    if (time[5] != ':') {
+        return 0;
+    }
+    if (!is_two_digits(time + 6, 0, 59)) {
         return 0;
     }
     return 1;
