@@ -139,3 +139,20 @@ int validate_url(const char *link) {
     }
     return 1;
 }
+
+int validate_status(const char *status) {
+    if (!isdigit((unsigned char)status[0])) {
+        return 0;
+    }
+    int c = (status[0] - '0');
+    if (c < 1 || c > 5) {
+        return 0;
+    }
+    if (!is_two_digits(status + 1, 0, 99)) {
+        return 0;
+    }
+    if (isdigit((unsigned char)status[3])) {
+        return 0;
+    }
+    return 1;
+}
