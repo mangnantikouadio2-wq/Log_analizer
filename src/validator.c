@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include "parser.h"
+#include "validator.h"
 
 int validate_ip(const char *ip) {
    int octets = 0;
