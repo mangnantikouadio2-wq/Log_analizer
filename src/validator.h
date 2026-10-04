@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef VALIDATOR_H
+#define VALIDATOR_H
 
 int validate_ip(const char *ip);
 int validate_timestamp(const char *timestamp);
