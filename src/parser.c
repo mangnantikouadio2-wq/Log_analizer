@@ -10,7 +10,6 @@ int parse_line(const char *line, LogEntity *entry) {
     }
     if (*line++ == '[') {
         state = IN_BRACKETS;
-        line++;
         while (state == IN_BRACKETS) {
             get_timestamp(&line, entry->timestamp);
             while (*line && *line != ']') {
@@ -36,6 +35,9 @@ int parse_line(const char *line, LogEntity *entry) {
                 line++;
             }
             get_link(&line, entry->req.url);
+            while(*line && *line != '"') {
+                line++;
+            }
             if (*line == '"') {
                 line++;
             }
