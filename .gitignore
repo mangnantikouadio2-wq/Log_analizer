@@ -1,5 +1,8 @@
 # Binaires
 parser
+run_parser
+run_validator
+*.d
 *.o
 *.out
 a.out
