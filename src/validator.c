@@ -3,6 +3,12 @@
 #include <string.h>
 #include "validator.h"
 
+static int is_valid_day(const char *day);
+static int is_valid_month(const char *month);
+static int is_valid_year(const char *year);
+static int is_valid_time(const char *time);
+static int is_two_digits(const char *s, int min, int max);
+
 int validate_ip(const char *ip) {
    int octets = 0;
    int value = 0;
