@@ -22,10 +22,10 @@ void test_parse_line_for_valid_line(void) {
     char line[] = "192.168.1.50 - - [24/Aug/2026:10:15:30 +0000] \"GET /admin/login HTTP/1.1\" 401 512\n";
     int r = parse_line(line, &e);
     CHECK(r == 1);
-    CHECK(strcmp(e.ip, "192.168.1.50") == 1);
-    CHECK(strcmp(e.timestamp, "24/Aug/2026:10:15:30") == 1);
-    CHECK(strcmp(e.req.method, "GET") == 1);
-    CHECK(strcmp(e.req.url, "/admin/login") == 1);
+    CHECK(strcmp(e.ip, "192.168.1.50") == 0);
+    CHECK(strcmp(e.timestamp, "24/Aug/2026:10:15:30") == 0);
+    CHECK(strcmp(e.req.method, "GET") == 0);
+    CHECK(strcmp(e.req.url, "/admin/login") == 0);
     CHECK(e.status == 401);
 }
 
