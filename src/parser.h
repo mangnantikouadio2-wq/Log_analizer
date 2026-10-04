@@ -15,11 +15,11 @@ typedef struct {
 char ip[16];
 char timestamp[32];
 Request req;
-int status;
+char status[4];
 } LogEntity;
 
 char *get_line(FILE *fp, char *buffer, size_t size);
-int get_status(const char *buffer);
+int get_status(const char *buffer,char *status);
 int get_ip(const char **buffer, char *IP);
 int get_timestamp(const char **buffer, char *timestamp);
 int get_method(const char **buffer, char *method);

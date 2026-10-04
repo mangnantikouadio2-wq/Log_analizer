@@ -26,7 +26,7 @@ void test_parse_line_for_valid_line(void) {
     CHECK(strcmp(e.timestamp, "24/Aug/2026:10:15:30") == 0);
     CHECK(strcmp(e.req.method, "GET") == 0);
     CHECK(strcmp(e.req.url, "/admin/login") == 0);
-    CHECK(e.status == 401);
+    CHECK(strcmp(e.status, "401") == 0);
 }
 
 void test_parse_line_for_empty_line(void) {

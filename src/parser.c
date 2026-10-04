@@ -49,6 +49,6 @@ int parse_line(const char *line, LogEntity *entry) {
     while(*line && (*line < '0' || *line > '9')) {
         line++;
     }
-    entry->status = get_status(line);
+    get_status(line, entry->status);
     return 1;
 }

@@ -2,8 +2,13 @@
 #include <stdlib.h>
 #include "parser.h"
 
-int get_status(const char *buffer) {
-    return atoi(buffer);
+int get_status(const char *buffer,char *status) {
+    int c = 0;
+    while(c < 3 && *buffer >= '0' && *buffer <= '9') {
+        status[c++] = *buffer++;
+    }
+    status[c] = '\0';
+    return 1;
 }
 
 int get_ip(const char **buffer, char *IP) {
