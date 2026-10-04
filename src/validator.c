@@ -95,7 +95,7 @@ static int is_two_digits(const char *s, int min, int max) {
     if (!isdigit((unsigned char)s[0]) || !isdigit((unsigned char)s[1])) {
         return 0;
     };
-    int d = (s[0] - '0') * 10 + (s[0] - '0');
+    int d = (s[0] - '0') * 10 + (s[1] - '0');
     return d>=min && d<=max;
 }
 
@@ -113,6 +113,9 @@ static int is_valid_time(const char *time) {
         return 0;
     }
     if (!is_two_digits(time + 6, 0, 59)) {
+        return 0;
+    }
+    if (time[8] != '\0') {
         return 0;
     }
     return 1;
