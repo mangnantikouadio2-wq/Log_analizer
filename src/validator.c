@@ -122,12 +122,16 @@ static int is_valid_time(const char *time) {
 }
 
 int validate_method(const char *method) {
-    for (int c=0; method[c] != '\0'; c++) {
-        if (!isalpha((unsigned char)method[c])) {
-            return 0;
+    static char *known_methods[] = {"GET", "POST", "PUT", "DELETE", "HEAD",
+                                    "OPTIONS", "PATCH", "CONNECT", "TRACE",
+                                    "PROPFIND", "MKCOL", "COPY", "MOVE", "LOCK",
+                                    "UNLOCK", "PLAY", "PAUSE"};
+    for (int i = 0; known_methods[i] != NULL; i++) {
+        if (strcmp(method, known_methods[i]) == 0) {
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 
 int validate_url(const char *link) {
