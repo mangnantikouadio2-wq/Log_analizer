@@ -45,8 +45,9 @@ void test_parse_line_for_missing_patterns(void) {
 void test_get_method_for_edge_case(void) {
     fprintf(stderr, "[get_method]: buffer overflow\n");
     char big[] = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    const char *p = big;
     char method[10];
-    get_method(&big, method);
+    get_method(&p, method);
     CHECK(strlen(method) <= 9);
     CHECK(method[9] == '\0');
 }
@@ -58,7 +59,8 @@ void test_get_link_for_edge_case1(void) {
     big[0] = '/';
     big[599] = '\0';
     char url[256];
-    get_link(&big, url);
+    const char *p = big;
+    get_link(&p, url);
     CHECK(strlen(url) <= 255);
     CHECK(url[255] == '\0');
 }
@@ -66,8 +68,9 @@ void test_get_link_for_edge_case1(void) {
 void test_get_link_for_edge_case2(void) {
     fprintf(stderr, "[get_link]: no closing quote");
     char no_quote[] = "/an/endless/url/that/continue/again/and/again";
+    const char *p = no_quote;
     char url[256];
-    get_link(&no_quote, url);
+    get_link(&p, url);
     CHECK(strlen(url) <256);
 }
 
