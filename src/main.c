@@ -4,8 +4,9 @@
 
 enum {is_weird, is_safe};
 
-int main(void) {
-    FILE *fp = fopen("log.txt", "r");
+int main(int argc, char *argv[]) {
+    char *file_name = (argc > 1) ? argv[1] : "log.txt";
+    FILE *fp = fopen(file_name, "r");
     if (!fp) {
         printf("OPENING ERROR\n");
         return 1;
