@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include "parser.h"
 
-int get_status(const char *buffer,char *status) {
+int get_status(const char **buffer,char *status) {
     int c = 0;
-    while(c < 3 && *buffer >= '0' && *buffer <= '9') {
-        status[c++] = *buffer++;
+    while(c < 3 && **buffer != ' ' && **buffer != '\0') {
+        status[c++] = *(*buffer)++;
     }
     status[c] = '\0';
     return 1;
@@ -29,6 +29,15 @@ int get_timestamp(const char **buffer, char *timestamp) {
     return 1;
 }
 
+int get_time_zone(const char **buffer, char *time_zone) {
+    int c = 0;
+    while(c < 7 && **buffer != ']' && **buffer != '\0') {
+        time_zone[c++] = *(*buffer)++;
+    }
+    time_zone[c] = '\0';
+    return 1;
+}
+
 int get_method(const char **buffer, char *method) {
     int c = 0;
     while(c < 9 && **buffer != ' ' && **buffer != '\0') {
@@ -45,4 +54,17 @@ int get_link(const char **buffer, char *URL) {
     }
     URL[c] = '\0';
     return 1;
+}
+
+int get_version(const char **buffer, char *version) {
+    int c = 0;
+    while(c < 9 && **buffer != '"' && **buffer != '\0') {
+        version[c++] = *(*buffer)++;
+    }
+    version[c] = '\0';
+    return 1;
+}
+
+int get_size(const char *buffer) {
+        return atol(buffer);
 }

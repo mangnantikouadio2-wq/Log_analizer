@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "parser.h"
 
 int parse_line(const char *line, LogEntity *entry) {
@@ -12,12 +13,43 @@ int parse_line(const char *line, LogEntity *entry) {
         state = IN_BRACKETS;
         while (state == IN_BRACKETS) {
             get_timestamp(&line, entry->timestamp);
-            while (*line && *line != ']') {
+            if (*line != ' ') {
+                return 0;
+            }
+            line++;
+            get_time_zone(&line, entry->time_zone);
+            if (*line != ']') {
+                return 0;
+            }
+            line++;
+            state = OUT;
+        }
+    } else {
+        return 0;
+    }
+    while (*line == ' ') {
+        line++;
+    }
+    if (*line == '"') {
+        state = IN_QUOTES;
+        line++;
+        while (state == IN_QUOTES) {
+            get_method(&line, entry->req.method);
+            if (*line != ' ') {
+                return 0;
+            }
+            line++;
+            get_link(&line, entry->req.url);
+            if (*line != ' ') {
+                return 0;
+            } else {
                 line++;
             }
-            if (*line == ']') {
-                line++;
+            get_version(&line, entry->req.http_version);
+            if (*line != '"') {
+                return 0;
             }
+            line++;
             state = OUT;
         }
     } else {
@@ -26,29 +58,16 @@ int parse_line(const char *line, LogEntity *entry) {
     while(*line == ' ') {
         line++;
     }
-    if (*line == '"') {
-        state = IN_QUOTES;
-        line++;
-        while (state == IN_QUOTES) {
-            get_method(&line, entry->req.method);
-            if (*line == ' ') {
-                line++;
-            }
-            get_link(&line, entry->req.url);
-            while(*line && *line != '"') {
-                line++;
-            }
-            if (*line == '"') {
-                line++;
-            }
-            state = OUT;
-        }
-    } else {
+    if (!isdigit((unsigned char)*line)) {
         return 0;
     }
-    while(*line && (*line < '0' || *line > '9')) {
+    get_status(&line, entry->status);
+    while(*line == ' ') {
         line++;
     }
-    get_status(line, entry->status);
+    if (!isdigit((unsigned char)*line)) {
+        return 0;
+    }
+    entry->response_bytes = get_size(line);
     return 1;
 }

@@ -24,9 +24,12 @@ void test_parse_line_for_valid_line(void) {
     CHECK(r == 1);
     CHECK(strcmp(e.ip, "192.168.1.50") == 0);
     CHECK(strcmp(e.timestamp, "24/Aug/2026:10:15:30") == 0);
+    CHECK(strcmp(e.time_zone, "+0000") == 0);
     CHECK(strcmp(e.req.method, "GET") == 0);
     CHECK(strcmp(e.req.url, "/admin/login") == 0);
+    CHECK(strcmp(e.req.http_version, "HTTP/1.1") == 0);
     CHECK(strcmp(e.status, "401") == 0);
+    CHECK(e.response_bytes == 512);
 }
 
 void test_parse_line_for_empty_line(void) {
