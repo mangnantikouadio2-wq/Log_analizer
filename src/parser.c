@@ -6,6 +6,9 @@
 int parse_line(const char *line, LogEntity *entry) {
     int state = OUT;
     get_ip(&line, entry->ip);
+    if (*line != ' ') {
+        return 0;
+    }
     while (*line == ' ' || *line == '-') {
         line++;
     }

@@ -58,6 +58,32 @@ int validate_timestamp(const char *timestamp) {
     return 1;
 }
 
+int validate_time_zone(const char *zone) {
+    if (zone[0] != '+' && zone[0] != '-') {
+        return 0;
+    }
+    if (!is_two_digits(zone + 1, 0, 23)) {
+        return 0;
+    }
+    if (!is_two_digits(zone + 3, 0, 59)) {
+        return 0;
+    }
+    if (zone[1] == '1' && zone[2] >= '4') {
+        if (zone[2] > '4') {
+            return 0;
+        } else if (zone[3] != '0' || zone[4] != '0') {
+            return 0;
+        }
+    }
+    if (zone[0] == '-' && !is_two_digits(zone + 1, 0, 12)) {
+        return 0;
+    }
+    if (zone[5] != '\0') {
+        return 0;
+    }
+    return 1;
+}
+
 static int is_valid_day(const char *day) {
     if (!is_two_digits(day, 1, 31)) {
         return 0;
@@ -166,6 +192,36 @@ int validate_status(const char *status) {
     }
     if (isdigit((unsigned char)status[3])) {
         return 0;
+    }
+    return 1;
+}
+
+int validate_version(const char *version) {
+    if (strncmp(version, "HTTP/", 5) != 0) {
+        return 0;
+    }
+    if (!isdigit((unsigned char)version[5]) || !isdigit((unsigned char)version[7])) {
+        return 0;
+    } else if (version[6] != '.') {
+        return 0;
+
+    }else if (version[5] < '0' || version[5] > '9' || version[7] < '0' || version[7] > '9') {
+        return 0;
+    } else if (version[8] != '\0') {
+        return 0;
+    }
+    return 1;
+}
+
+int is_valide_size(const char *size) {
+    if (*size == '\0') {
+        return 0;
+    }
+    while(*size && *size != ' ' && *size != '\n') {
+        if (!isdigit((unsigned char)*size)) {
+            return 0;
+        }
+        size++;
     }
     return 1;
 }

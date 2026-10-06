@@ -72,6 +72,36 @@ void test_validate_timestamp(void) {
     CHECK(validate_timestamp("24/Aug/2026:10:15:30extra")== 0);
 }
 
+void test_validate_time_zone(void) {
+    fprintf(stderr, "[validate_time_zone]\n");
+    CHECK(validate_time_zone("+0000") == 1);
+    CHECK(validate_time_zone("+0100") == 1);
+    CHECK(validate_time_zone("-0500") == 1);
+    CHECK(validate_time_zone("+0530") == 1);  
+    CHECK(validate_time_zone("-1200") == 1);
+    CHECK(validate_time_zone("+1400") == 1);  
+    CHECK(validate_time_zone("+0000") == 1);  
+    CHECK(validate_time_zone("-0000") == 1);  
+    CHECK(validate_time_zone("+2359") == 1);  
+    CHECK(validate_time_zone("")      == 0);  
+    CHECK(validate_time_zone("+000")  == 0);  
+    CHECK(validate_time_zone("+00000")== 0);  
+    CHECK(validate_time_zone("+00a0") == 0);  
+    CHECK(validate_time_zone("+00 0") == 0);  
+    CHECK(validate_time_zone("0000")  == 0); 
+    CHECK(validate_time_zone("+")     == 0);  
+    CHECK(validate_time_zone("+0")    == 0);  
+    CHECK(validate_time_zone("*0000") == 0);  
+    CHECK(validate_time_zone(" 0000") == 0);  
+    CHECK(validate_time_zone("+ 000") == 0);  
+    CHECK(validate_time_zone("++000") == 0);  
+    CHECK(validate_time_zone("+-000") == 0);  
+    CHECK(validate_time_zone("+2400") == 0);   
+    CHECK(validate_time_zone("+1260") == 0);   
+    CHECK(validate_time_zone("+1500") == 0);   
+    CHECK(validate_time_zone("+2360") == 0); 
+}
+
 void test_validate_method(void) {
     fprintf(stderr, "[validate_method]\n");
     CHECK(validate_method("GET")     == 1);
@@ -113,12 +143,43 @@ void test_validate_url(void) {
     CHECK(validate_url("/index\x7F")  == 0);
 }
 
+void test_validate_version(void) {
+    fprintf(stderr, "[validate_version]\n");
+    CHECK(validate_version("HTTP/1.1") == 1);
+    CHECK(validate_version("HTTP/1.0") == 1);
+    CHECK(validate_version("HTTP/2.0") == 1);
+    CHECK(validate_version("HTTP/3.0") == 1);
+    CHECK(validate_version("HTTP/0.9") == 1);  
+    CHECK(validate_version("HTTP/9.9") == 1);  
+    CHECK(validate_version("")         == 0);  
+    CHECK(validate_version("HTTP/")    == 0);  
+    CHECK(validate_version("HTTP/1")   == 0); 
+    CHECK(validate_version("HTTP/1.1.1")== 0);  
+    CHECK(validate_version("HTTP/1.")   == 0);  
+    CHECK(validate_version("HTTP/.1")   == 0); 
+    CHECK(validate_version("HTTP//1.1") == 0);  
+    CHECK(validate_version("http/1.1")  == 0);  
+    CHECK(validate_version("HTTP1.1")   == 0);  
+    CHECK(validate_version("HTTPS/1.1") == 0);  
+    CHECK(validate_version(" FTP/1.1")  == 0);     
+    CHECK(validate_version("HTTP /1.1") == 0);  
+    CHECK(validate_version("XHTTP/1.1") == 0);  
+    CHECK(validate_version("HTTPX/1.1") == 0); 
+    CHECK(validate_version("HTTP/a.1")  == 0);  
+    CHECK(validate_version("HTTP/1.a")  == 0);  
+    CHECK(validate_version("HTTP/1-1")  == 0);  
+    CHECK(validate_version("HTTP/1,1")  == 0); 
+    CHECK(validate_version("HTTP/11")   == 0); 
+}
+
 int main(void) {
     test_validate_ip();
+    test_validate_time_zone();
     test_validate_status();
     test_validate_timestamp();
     test_validate_method();
     test_validate_url();
+    test_validate_version();
     fprintf(stderr, "\n=== %d tests, %d échecs ===\n",
             tests_run, tests_failed);
     return tests_failed > 0;
