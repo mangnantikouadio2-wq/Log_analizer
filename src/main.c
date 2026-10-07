@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
     int line_state;
     char line_buffer[BUFFER_SIZE];
     LogEntity current_entry;
-    while(fgets(line_buffer, sizeof(line_buffer), fp) != NULL) {
+    while(get_line(fp, line_buffer, sizeof(line_buffer)) != NULL) {
         line_state = is_safe;
-        if (parse_line(line_buffer, &current_entry)) {
+        if (parse_line(line_buffer, &current_entry) == 1) {
             printf("Line %d : ", line_count);
             if (validate_ip(current_entry.ip)) {
                 printf("IP=%s | ", current_entry.ip);
@@ -29,6 +29,12 @@ int main(int argc, char *argv[]) {
                 printf("TIMESTAMP=%s | ", current_entry.timestamp);
             } else {
                 printf("[INVALID TIMESTAMP: \"%s\"] | ", current_entry.timestamp);
+                line_state = is_weird;
+            }
+            if (validate_time_zone(current_entry.time_zone)) {
+                printf("TIMEZONE=%s | ", current_entry.time_zone);
+            } else {
+                printf("[INVALID TIMEZONE: \"%s\"] | ", current_entry.time_zone);
                 line_state = is_weird;
             }
             if (validate_method(current_entry.req.method)) {
@@ -43,11 +49,23 @@ int main(int argc, char *argv[]) {
                 printf("[INVALID URL: \"%s\"] | ", current_entry.req.url);
                 line_state = is_weird;
             }
-            if (validate_status(current_entry.status)) {
-                printf("STATUS=%s ", current_entry.status);
+            if (validate_version(current_entry.req.http_version)) {
+                printf("HTTP_VERSION=%s | ", current_entry.req.http_version);
             } else {
-                printf("[INVALID STATUS: \"%s\"] ", current_entry.status);
+                printf("[INVALID HTTP_VERSION: \"%s\"] | ", current_entry.req.http_version);
                 line_state = is_weird;
+            }
+            if (validate_status(current_entry.status)) {
+                printf("STATUS=%s | ", current_entry.status);
+            } else {
+                printf("[INVALID STATUS: \"%s\"] | ", current_entry.status);
+                line_state = is_weird;
+            }
+            if (current_entry.response_bytes == 0) {
+                printf("[RESPONSE_BYTES=0!!] ");
+                line_state = is_weird;
+            } else {
+                printf("RESPONSE_BYTES=%lu ", current_entry.response_bytes);
             }
             switch (line_state) {
             case is_weird:
@@ -58,8 +76,16 @@ int main(int argc, char *argv[]) {
                 printf("-> [OK]\n");
                 break;
             }
-        } else {
-            printf("INVALID LINE(corrupted structure) -> [REJECTED]!\n");
+        } else if (parse_line(line_buffer, &current_entry) == 0) {
+            printf("INVALID LINE(no status or no response size) -> [REJECTED]!\n");
+        } else if(parse_line(line_buffer, &current_entry) == MISSING_SPACE) {
+            printf("INVALID LINE(missing space) -> [REJECTED]!\n");
+        } else if(parse_line(line_buffer, &current_entry) == MISSING_BRACKET) {
+            printf("INVALID LINE(missing bracket) -> [REJECTED]!\n");
+        } else if(parse_line(line_buffer, &current_entry) == MISSING_QUOTE) {
+            printf("INVALID LINE(missing quote) -> [REJECTED]!\n");
+        } else if(parse_line(line_buffer, &current_entry) == TOO_LONG_URL) {
+            printf("INVALID LINE(too long URL) -> [REJECTED]!\n");
         }
         line_count++;
     }
