@@ -47,9 +47,12 @@ int get_method(const char **buffer, char *method) {
     return 1;
 }
 
-int get_link(const char **buffer, char *URL) {
-    int c = 0;
-    while(c < 255 && **buffer != ' ' && **buffer != '\0') {
+int get_link(const char **buffer, char *URL, size_t capacity) {
+    size_t c = 0;
+    while(**buffer != ' ' && **buffer != '\0' && **buffer != '"') {
+        if (c + 1 >= capacity) {
+            return 0;
+        }
         URL[c++] = *(*buffer)++;
     }
     URL[c] = '\0';
