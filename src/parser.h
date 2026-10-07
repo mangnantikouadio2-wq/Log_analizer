@@ -4,7 +4,12 @@
 #define BUFFER_SIZE 512
 #define OUT 0
 
-enum {IN_BRACKETS=1, IN_QUOTES};
+enum error_cause {
+    MISSING_SPACE = 2,
+    MISSING_BRACKET,
+    MISSING_QUOTE,
+    TOO_LONG_URL
+};
 
 typedef struct {
 char method[10];
@@ -27,7 +32,7 @@ int get_ip(const char **buffer, char *IP);
 int get_timestamp(const char **buffer, char *timestamp);
 int get_time_zone(const char **buffer, char *time_zone);
 int get_method(const char **buffer, char *method);
-int get_link(const char **buffer, char *URL);
+int get_link(const char **buffer, char *URL, size_t capacity);
 int get_version(const char **buffer, char *version);
 int get_size(const char *buffer);
 int parse_line(const char *line, LogEntity *entry);
