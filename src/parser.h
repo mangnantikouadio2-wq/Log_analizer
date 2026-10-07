@@ -26,7 +26,7 @@ char status[4];
 unsigned long response_bytes;
 } LogEntity;
 
-char *get_line(FILE *fp, char *buffer, size_t size);
+char *get_line(FILE *fp, char *buffer, int size);
 int get_status(const char **buffer,char *status);
 int get_ip(const char **buffer, char *IP);
 int get_timestamp(const char **buffer, char *timestamp);
