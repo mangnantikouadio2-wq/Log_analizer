@@ -15,10 +15,19 @@ int main(int argc, char *argv[]) {
     int line_state;
     char line_buffer[BUFFER_SIZE];
     LogEntity current_entry;
-    while(get_line(fp, line_buffer, sizeof(line_buffer)) != NULL) {
+    while(1) {
+        char *line = get_line(fp, line_buffer, sizeof(line_buffer));
+        if (line == NULL) {
+            if (feof(fp)) {
+                break;
+            }
+            printf("Line %d : The line is too long -> [REJECTED]!\n", line_count);
+            continue;
+        }
         line_state = is_safe;
-        if (parse_line(line_buffer, &current_entry) == 1) {
-            printf("Line %d : ", line_count);
+        printf("Line %d : ", line_count);
+        int result = parse_line(line_buffer, &current_entry);
+        if (result == 1) {
             if (validate_ip(current_entry.ip)) {
                 printf("IP=%s | ", current_entry.ip);
             } else {
@@ -61,12 +70,7 @@ int main(int argc, char *argv[]) {
                 printf("[INVALID STATUS: \"%s\"] | ", current_entry.status);
                 line_state = is_weird;
             }
-            if (current_entry.response_bytes == 0) {
-                printf("[RESPONSE_BYTES=0!!] ");
-                line_state = is_weird;
-            } else {
-                printf("RESPONSE_BYTES=%lu ", current_entry.response_bytes);
-            }
+            printf("RESPONSE_BYTES=%lu ", current_entry.response_bytes);
             switch (line_state) {
             case is_weird:
                 printf("-> [WARNING]\n");
@@ -76,15 +80,15 @@ int main(int argc, char *argv[]) {
                 printf("-> [OK]\n");
                 break;
             }
-        } else if (parse_line(line_buffer, &current_entry) == 0) {
+        } else if (result == 0) {
             printf("INVALID LINE(no status or no response size) -> [REJECTED]!\n");
-        } else if(parse_line(line_buffer, &current_entry) == MISSING_SPACE) {
+        } else if (result == MISSING_SPACE) {
             printf("INVALID LINE(missing space) -> [REJECTED]!\n");
-        } else if(parse_line(line_buffer, &current_entry) == MISSING_BRACKET) {
+        } else if (result == MISSING_BRACKET) {
             printf("INVALID LINE(missing bracket) -> [REJECTED]!\n");
-        } else if(parse_line(line_buffer, &current_entry) == MISSING_QUOTE) {
+        } else if (result == MISSING_QUOTE) {
             printf("INVALID LINE(missing quote) -> [REJECTED]!\n");
-        } else if(parse_line(line_buffer, &current_entry) == TOO_LONG_URL) {
+        } else if (result == TOO_LONG_URL) {
             printf("INVALID LINE(too long URL) -> [REJECTED]!\n");
         }
         line_count++;
