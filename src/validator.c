@@ -10,6 +10,9 @@ static int is_valid_time(const char *time);
 static int is_two_digits(const char *s, int min, int max);
 
 int validate_ip(const char *ip) {
+    if (strlen(ip) < 7 || strlen(ip) > 15) {
+        return 0;
+    }
    int octets = 0;
    int value = 0;
    int digits = 0;
@@ -43,6 +46,9 @@ int validate_ip(const char *ip) {
 }
 
 int validate_timestamp(const char *timestamp) {
+    if (strlen(timestamp) != 20) {
+        return 0;
+    }
     if (!is_valid_day(timestamp)) {
         return 0;
     }
@@ -59,6 +65,9 @@ int validate_timestamp(const char *timestamp) {
 }
 
 int validate_time_zone(const char *zone) {
+    if (strlen(zone) != 5) {
+        return 0;
+    }
     if (zone[0] != '+' && zone[0] != '-') {
         return 0;
     }
@@ -180,6 +189,9 @@ int validate_url(const char *link) {
 }
 
 int validate_status(const char *status) {
+    if (strlen(status) != 3) {
+        return 0;
+    }
     if (!isdigit((unsigned char)status[0])) {
         return 0;
     }
@@ -197,6 +209,9 @@ int validate_status(const char *status) {
 }
 
 int validate_version(const char *version) {
+    if (strlen(version) != 8) {
+        return 0;
+    }
     if (strncmp(version, "HTTP/", 5) != 0) {
         return 0;
     }
