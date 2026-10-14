@@ -12,7 +12,7 @@ int parse_line(const char *line, LogEntity *entry) {
     }
     get_ip(&line, entry->ip);
     if (*line != ' ') {
-        return MISSING_SPACE;
+        return 0;
     }
     while (*line == ' ' || *line == '-') {
         line++;
@@ -25,7 +25,7 @@ int parse_line(const char *line, LogEntity *entry) {
             }
             get_timestamp(&line, entry->timestamp);
             if (*line != ' ') {
-                return MISSING_SPACE;
+                return 0;
             }
             line++;
             if (*line != '+' && *line != '-') {
@@ -53,14 +53,14 @@ int parse_line(const char *line, LogEntity *entry) {
             }
             get_method(&line, entry->req.method);
             if (*line != ' ') {
-                return MISSING_SPACE;
+                return 0;
             }
             line++;
             if (!get_link(&line, entry->req.url, sizeof(entry->req.url))) {
                 return TOO_LONG_URL;
             }
             if (*line != ' ') {
-                return MISSING_SPACE;
+                return 0;
             } else {
                 line++;
             }
@@ -78,7 +78,7 @@ int parse_line(const char *line, LogEntity *entry) {
         return MISSING_QUOTE;
     }
     if (*line != ' ') {
-        return MISSING_SPACE;
+        return 0;
     }
     while(*line == ' ') {
         line++;
@@ -88,7 +88,7 @@ int parse_line(const char *line, LogEntity *entry) {
     }
     get_status(&line, entry->status);
     if (*line != ' ') {
-        return MISSING_SPACE;
+        return 0;
     }
     while(*line == ' ') {
         line++;

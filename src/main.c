@@ -81,15 +81,25 @@ int main(int argc, char *argv[]) {
                 break;
             }
         } else if (result == 0) {
-            printf("INVALID LINE(no status or no response size) -> [REJECTED]!\n");
-        } else if (result == MISSING_SPACE) {
-            printf("INVALID LINE(missing space) -> [REJECTED]!\n");
+            printf("INVALID LINE: BROKEN LINE STRUCTURE -> [REJECTED]!\n");
         } else if (result == MISSING_BRACKET) {
-            printf("INVALID LINE(missing bracket) -> [REJECTED]!\n");
+            printf("INVALID LINE: MISSING_BRACKET -> [REJECTED]!\n");
         } else if (result == MISSING_QUOTE) {
-            printf("INVALID LINE(missing quote) -> [REJECTED]!\n");
+            printf("INVALID LINE: MISSING QUOTE -> [REJECTED]!\n");
         } else if (result == TOO_LONG_URL) {
-            printf("INVALID LINE(too long URL) -> [REJECTED]!\n");
+            printf("INVALID LINE: TOO LONG URL -> [REJECTED]!\n");
+        } else if (result == MISSING_IP) {
+            printf("INVALID LINE: MISSING IP -> [REJECTED]!\n");
+        } else if (result == MISSING_METHOD) {
+            printf("INVALID LINE: MISSING METHOD -> [REJECTED]!\n");
+        } else if (result == MISSING_RESPONSE_SIZE) {
+            printf("INVALID LINE: MISSING RESPONSE SIZE -> [REJECTED]!\n");
+        } else if (result == MISSING_TIMESTAMP) {
+            printf("INVALID LINE: MISSING TIMESTAMP -> [REJECTED]!\n");
+        } else if (result == MISSING_TIMEZONE) {
+            printf("INVALID LINE: MISSING TIME ZONE -> [REJECTED]!\n");
+        } else if (result == MISSING_VERSION) {
+            printf("INVALID LINE: MISSING VERSION -> [REJECTED]!\n");
         }
         line_count++;
     }

@@ -5,8 +5,7 @@
 #define OUT 0
 
 enum error_cause {
-    MISSING_SPACE = 2,
-    MISSING_IP,
+    MISSING_IP = 2,
     MISSING_TIMESTAMP,
     MISSING_TIMEZONE,
     MISSING_METHOD,
