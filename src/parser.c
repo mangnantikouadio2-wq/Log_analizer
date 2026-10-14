@@ -7,6 +7,9 @@ enum {IN_BRACKETS=1, IN_QUOTES};
 
 int parse_line(const char *line, LogEntity *entry) {
     int state = OUT;
+    if (!isdigit((unsigned char)*line)) {
+        return MISSING_IP;
+    }
     get_ip(&line, entry->ip);
     if (*line != ' ') {
         return MISSING_SPACE;
@@ -17,11 +20,17 @@ int parse_line(const char *line, LogEntity *entry) {
     if (*line++ == '[') {
         state = IN_BRACKETS;
         while (state == IN_BRACKETS) {
+            if (!isdigit((unsigned char)*line)) {
+                return MISSING_TIMESTAMP;
+            }
             get_timestamp(&line, entry->timestamp);
             if (*line != ' ') {
                 return MISSING_SPACE;
             }
             line++;
+            if (*line != '+' && *line != '-') {
+                return MISSING_TIMEZONE;
+            }
             get_time_zone(&line, entry->time_zone);
             if (*line != ']') {
                 return MISSING_BRACKET;
@@ -39,6 +48,9 @@ int parse_line(const char *line, LogEntity *entry) {
         state = IN_QUOTES;
         line++;
         while (state == IN_QUOTES) {
+            if (!isalpha((unsigned char)*line)) {
+                return MISSING_METHOD;
+            }
             get_method(&line, entry->req.method);
             if (*line != ' ') {
                 return MISSING_SPACE;
@@ -51,6 +63,9 @@ int parse_line(const char *line, LogEntity *entry) {
                 return MISSING_SPACE;
             } else {
                 line++;
+            }
+            if (!isalpha((unsigned char)*line)) {
+                return MISSING_VERSION;
             }
             get_version(&line, entry->req.http_version);
             if (*line != '"') {
@@ -81,6 +96,14 @@ int parse_line(const char *line, LogEntity *entry) {
     if (!isdigit((unsigned char)*line)) {
         return 0;
     }
-    entry->response_bytes = get_size(line);
+    char *end;
+    entry->response_bytes = strtoul(line, &end, 10);
+    if (end == line) {
+        return MISSING_RESPONSE_SIZE;
+    }
+    line = end;
+    if (*line != '\n' && *line != '\0') {
+        return 0;
+    }
     return 1;
 }

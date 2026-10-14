@@ -35,7 +35,7 @@ void test_parse_line_for_valid_line(void) {
 void test_parse_line_for_empty_line(void) {
     fprintf(stderr, "[parse_line]: empty line\n");
     LogEntity e;
-    CHECK(parse_line("", &e) == MISSING_SPACE);
+    CHECK(parse_line("", &e) == 0);
 }
 
 void test_parse_line_for_missing_patterns(void) {

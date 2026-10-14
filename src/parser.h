@@ -6,6 +6,12 @@
 
 enum error_cause {
     MISSING_SPACE = 2,
+    MISSING_IP,
+    MISSING_TIMESTAMP,
+    MISSING_TIMEZONE,
+    MISSING_METHOD,
+    MISSING_VERSION,
+    MISSING_RESPONSE_SIZE,
     MISSING_BRACKET,
     MISSING_QUOTE,
     TOO_LONG_URL
@@ -34,7 +40,6 @@ int get_time_zone(const char **buffer, char *time_zone);
 int get_method(const char **buffer, char *method);
 int get_link(const char **buffer, char *URL, size_t capacity);
 int get_version(const char **buffer, char *version);
-int get_size(const char *buffer);
 int parse_line(const char *line, LogEntity *entry);
 
 #endif

@@ -68,6 +68,6 @@ int get_version(const char **buffer, char *version) {
     return 1;
 }
 
-int get_size(const char *buffer) {
+/*int get_size(const char *buffer) {
         return atol(buffer);
-}
+}*/
