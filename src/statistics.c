@@ -1,8 +1,6 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "statistics.h"
-
 
 static void is_code_in_range(const int code, unsigned long *count, int begin, int end) {
     if (code >= begin && code < end) {
@@ -21,6 +19,7 @@ void stats_record_parse_result(const int result, Stats *s) {
 
 static void classyfy_status(const char *status, Stats *s) {
     int code = atoi(status);
+    is_code_in_range(code, &s->status_count[code], 100, MAX_STATUS);
     is_code_in_range(code, &s->successfull, 200, 300);
     is_code_in_range(code, &s->redirect, 300, 400);
     is_code_in_range(code, &s->client_error, 400, 500);
@@ -45,13 +44,16 @@ static void count_methods(const char *method, Stats *s) {
     if (strcmp(method, "UNLOCK")== 0) s->n_UNLOCK++;
     if (strcmp(method, "PLAY")  == 0) s->n_PLAY++;
     if (strcmp(method, "PAUSE") == 0) s->n_PAUSE++;
+    else s->n_other_method++;
 }
 
 void stats_init(Stats *s) {
     *s = (Stats){0};
 }
 
-void stats_update(Stats *s, const LogEntity *entry) {
-    count_methods(entry->req.method, s);
-    classyfy_status(entry->status, s);
+void stats_update(Stats *s, const LogEntity *entry, int result) {
+    if (result == 1) {
+        count_methods(entry->req.method, s);
+        classyfy_status(entry->status, s);
+    }
 }
