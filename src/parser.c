@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "parser.h"
@@ -6,11 +5,12 @@
 enum {IN_BRACKETS=1, IN_QUOTES};
 
 int parse_line(const char *line, LogEntity *entry) {
+    LogEntity tmp = {0};
     int state = OUT;
     if (!isdigit((unsigned char)*line)) {
         return MISSING_IP;
     }
-    get_ip(&line, entry->ip);
+    get_ip(&line, tmp.ip);
     if (*line != ' ') {
         return 0;
     }
@@ -23,7 +23,7 @@ int parse_line(const char *line, LogEntity *entry) {
             if (!isdigit((unsigned char)*line)) {
                 return MISSING_TIMESTAMP;
             }
-            get_timestamp(&line, entry->timestamp);
+            get_timestamp(&line, tmp.timestamp);
             if (*line != ' ') {
                 return 0;
             }
@@ -31,7 +31,7 @@ int parse_line(const char *line, LogEntity *entry) {
             if (*line != '+' && *line != '-') {
                 return MISSING_TIMEZONE;
             }
-            get_time_zone(&line, entry->time_zone);
+            get_time_zone(&line, tmp.time_zone);
             if (*line != ']') {
                 return MISSING_BRACKET;
             }
@@ -51,12 +51,12 @@ int parse_line(const char *line, LogEntity *entry) {
             if (!isalpha((unsigned char)*line)) {
                 return MISSING_METHOD;
             }
-            get_method(&line, entry->req.method);
+            get_method(&line, tmp.req.method);
             if (*line != ' ') {
                 return 0;
             }
             line++;
-            if (!get_link(&line, entry->req.url, sizeof(entry->req.url))) {
+            if (!get_link(&line, tmp.req.url, sizeof(tmp.req.url))) {
                 return TOO_LONG_URL;
             }
             if (*line != ' ') {
@@ -67,7 +67,7 @@ int parse_line(const char *line, LogEntity *entry) {
             if (!isalpha((unsigned char)*line)) {
                 return MISSING_VERSION;
             }
-            get_version(&line, entry->req.http_version);
+            get_version(&line, tmp.req.http_version);
             if (*line != '"') {
                 return MISSING_QUOTE;
             }
@@ -86,7 +86,7 @@ int parse_line(const char *line, LogEntity *entry) {
     if (!isdigit((unsigned char)*line)) {
         return 0;
     }
-    get_status(&line, entry->status);
+    get_status(&line, tmp.status);
     if (*line != ' ') {
         return 0;
     }
@@ -97,7 +97,7 @@ int parse_line(const char *line, LogEntity *entry) {
         return 0;
     }
     char *end;
-    entry->response_bytes = strtoul(line, &end, 10);
+    tmp.response_bytes = strtoul(line, &end, 10);
     if (end == line) {
         return MISSING_RESPONSE_SIZE;
     }
@@ -105,5 +105,6 @@ int parse_line(const char *line, LogEntity *entry) {
     if (*line != '\n' && *line != '\0') {
         return 0;
     }
+    *entry = tmp;
     return 1;
 }

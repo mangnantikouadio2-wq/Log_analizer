@@ -35,7 +35,7 @@ void test_parse_line_for_valid_line(void) {
 void test_parse_line_for_empty_line(void) {
     fprintf(stderr, "[parse_line]: empty line\n");
     LogEntity e;
-    CHECK(parse_line("", &e) == 0);
+    CHECK(parse_line("", &e) == MISSING_IP);
 }
 
 void test_parse_line_for_missing_patterns(void) {
@@ -49,9 +49,9 @@ void test_parse_line_for_malformed_lines(void) {
     fprintf(stderr, "[parse_line]: malformed lines\n");
     LogEntity e;
     char line1[] = "192.168.1.6 - - [10/Oct/2026:10:00: 6 +0000] GET /malformed_line1 HTTP/1.1 500 5678";
-    CHECK(parse_line(line1, &e) == 0);
+    CHECK(parse_line(line1, &e) == MISSING_TIMEZONE);
     char line2[] = "- - [10/Oct/2026:10:00:06 +0000] GET /malformed_line2 HTTP/1.1 500 5678";
-    CHECK(parse_line(line2, &e) == 0);
+    CHECK(parse_line(line2, &e) == MISSING_IP);
     char line3[] = "192.168.1.6 - - [10/Oct/2026:10:00:06 +0000] \"GET /malformed_line3 HTTP/1.1\" 500 5678 extra_field";
     CHECK(parse_line(line3, &e) == 0);
 }
