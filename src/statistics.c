@@ -47,12 +47,39 @@ static void count_methods(const char *method, Stats *s) {
     else s->n_other_method++;
 }
 
+static void ip_increment(IP_Table *t, const char *ip) {
+    for (size_t i = 0; i < t->n_ips; i++) {
+        if (strcmp(t->IpTable[i].ip, ip) == 0) {
+            t->IpTable[i].count++;
+            return;
+        }
+    }
+    if (t->n_ips < MAX_IPs) {
+        strcpy(t->IpTable[t->n_ips].ip, ip);
+        t->IpTable[t->n_ips].count = 1;
+        t->n_ips++;
+    }
+}
+
+static int compare_ips(const void *ip_a, const void *ip_b) {
+    const IP_count *count_a = (const IP_count *)ip_a;
+    const IP_count *count_b = (const IP_count *)ip_b;
+    if (count_a->count < count_b->count) {
+        return 1;
+    }
+    if (count_a->count > count_b->count) {
+        return -1;
+    }
+    return 0;
+}
+
 void stats_init(Stats *s) {
     *s = (Stats){0};
 }
 
 void stats_update(Stats *s, const LogEntity *entry, int result) {
     if (result == 1) {
+        ip_increment(&s->IPs, entry->ip);
         count_methods(entry->req.method, s);
         classyfy_status(entry->status, s);
     }

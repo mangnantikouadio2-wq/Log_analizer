@@ -4,6 +4,17 @@
 #include "parser.h"
 
 #define MAX_STATUS 600
+#define MAX_IPs 1000
+
+typedef struct {
+    char ip[16];
+    unsigned long count;
+} IP_count;
+
+typedef struct {
+    IP_count IpTable[MAX_IPs];
+    size_t n_ips;
+} IP_Table;
 
 typedef struct {
     unsigned long total_lines;
@@ -16,6 +27,7 @@ typedef struct {
     unsigned long server_error;
     unsigned long n_GET, n_POST, n_PUT, n_DELETE, n_HEAD,n_OPTIONS, n_PATCH, n_CONNECT, n_TRACE;
     unsigned long n_PROPFIND, n_MKCOL, n_COPY, n_MOVE, n_LOCK, n_UNLOCK, n_PLAY, n_PAUSE, n_other_method;
+    IP_Table IPs;
 } Stats;
 
 void stats_init(Stats *s);
