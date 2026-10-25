@@ -23,7 +23,10 @@ static void classyfy_status(const char *status, Stats *s) {
     is_code_in_range(code, &s->successfull, 200, 300);
     is_code_in_range(code, &s->redirect, 300, 400);
     is_code_in_range(code, &s->client_error, 400, 500);
-    is_code_in_range(code, &s->server_error, 500, 600);   
+    is_code_in_range(code, &s->server_error, 500, 600);
+    if (code < 200 || code > 600) {
+        s->other++;
+    }
 }
 
 static void count_methods(const char *method, Stats *s) {
