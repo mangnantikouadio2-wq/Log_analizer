@@ -3,7 +3,8 @@ import random
 def normal_line(x):
     x_ip = x % 256
     x_sec = x % 60
-    return(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /normal{x} HTTP/1.1" 200 1234')
+    return f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /normal{x} HTTP/1.1" 200 1234'
+
 def error_line(x, motif):
     x_ip = x % 256
     x_sec = x % 60
@@ -11,7 +12,7 @@ def error_line(x, motif):
     if motif == 'incorrect_ip':
         lines.append(f'256.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /{motif}{x} HTTP/1.1" 500 5678')
     elif motif == 'invalid_timestamp':
-        lines.append(f'192.168.1.{x_ip} - - [32/Oct/2026:10:00:0{x_sec:02d} +0000] "GET /{motif}{x} HTTP/1.1" 500 5678')
+        lines.append(f'192.168.1.{x_ip} - - [32/Oct/2026:10:00:{x_sec:02d} +0000] "GET /{motif}{x} HTTP/1.1" 500 5678')
         lines.append(f'10.0.0.{x_ip} - - [24/Xxx/2020:10:00:{x_sec:02d} +0000] "POST /{motif}{x} HTTP/1.1" 400 5678')
         lines.append(f'127.16.8.{x_ip} - - [24/Aug/2025:25:17:25 +0000] "DELETE /{motif}{x} HTTP/1.1" 400 5678')
     elif motif == 'invalid_method':
@@ -20,7 +21,7 @@ def error_line(x, motif):
         lines.append(f'198.51.100.{x_ip} - - [23/Nov/2025:15:45:{x_sec:02d} +0000] "FAS@T /{motif}{x} HTTP/1.1" 400 5678')
     elif motif == 'invalid_url':
         lines.append(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET bad-url{x} HTTP/1.1" 500 5678')
-        lines.append(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /#$%&**\car%mpth#&~bad$url() HTTP/1.1" 500 5678')
+        lines.append(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /#$%&**car%mpth#&~bad$url() HTTP/1.1" 500 5678')
         lines.append(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET {motif}{x} HTTP/1.1" 500 5678')
     elif motif == 'invalid_status_code':
         lines.append(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /{motif}{x} HTTP/1.1" 999 5678')
@@ -50,26 +51,61 @@ def ridicule_lines(x):
     lines.append(f'192.168.1.{x_ip} - - [10/Oct/2026:10:00:{x_sec:02d} +0000] "GET /' + 'ridicule' * 500 + ' HTTP/1.1" 200 1234')
     return lines
 
-def generate_log_file(filename, num_lines=100):
+def generate_log_file(filename, num_lines=100, normal_ratio=0.5):
     motifs = ['incorrect_ip', 'invalid_timestamp', 'invalid_method', 'invalid_url', 'invalid_status_code', 'malformed_line', 'missing_fields']
-    lines_types = ['normal', 'error', 'ridicule']
+    stats = {
+        'total': 0,
+        'normal': 0,
+        'error': 0,
+        'ridicule': 0,
+        'motifs': {m: 0 for m in motifs},
+        'error_lines': 0,
+        'ridicule_lines': 0,
+    }
+
     with open(filename, 'w') as f:
         for i in range(num_lines):
-            line_type = random.choice(lines_types)
-            if line_type == 'normal':
+            r = random.random()
+            if r < normal_ratio:
                 line = normal_line(i)
                 f.write(line + '\n')
-            elif line_type == 'error':
-                motif = random.choice(motifs)
-                error_lines = error_line(i, motif)
-                for line in error_lines:
-                    f.write(line + '\n')
-            elif line_type == 'ridicule':
-                ridicule_lines_list = ridicule_lines(i)
-                for line in ridicule_lines_list:
-                    f.write(line + '\n')
+                stats['normal'] += 1
+                stats['total'] += 1
+            else:
+                if random.random() < 0.5:
+                    motif = random.choice(motifs)
+                    error_lines = error_line(i, motif)
+                    for line in error_lines:
+                        f.write(line + '\n')
+                    stats['error'] += 1
+                    stats['motifs'][motif] += 1
+                    stats['error_lines'] += len(error_lines)
+                    stats['total'] += len(error_lines)
+                else:
+                    ridicule_lines_list = ridicule_lines(i)
+                    for line in ridicule_lines_list:
+                        f.write(line + '\n')
+                    stats['ridicule'] += 1
+                    stats['ridicule_lines'] += len(ridicule_lines_list)
+                    stats['total'] += len(ridicule_lines_list)
         last_line = '192.168.1.18 - - [13/Oct/2026:10:42:08 +0000] "GET /end HTTP/1.1" 200 700'
         f.write(last_line)
+        stats['total'] += 1
+    print(f"=== Génération de {filename} ===")
+    print(f"Lignes totales       : {stats['total']}")
+    print(f"  ├─ Normales        : {stats['normal']} (blocs)")
+    print(f"  ├─ Erreurs         : {stats['error']} (blocs → {stats['error_lines']} lignes)")
+    print(f"  ├─ Ridicules       : {stats['ridicule']} (blocs → {stats['ridicule_lines']} lignes)")
+    print(f"  └─ Dernière ligne  : 1 (sans \\n)")
+    print(f"\nDétail des motifs d'erreur :")
+    for m, count in stats['motifs'].items():
+        if count > 0:
+            print(f"  {m:20s} : {count} bloc(s)")
+    approx_normal = stats['normal']
+    approx_error = stats['error_lines']
+    approx_ridicule = stats['ridicule_lines']
+    print(f"\nEstimation lignes valides (normal) : {approx_normal}")
+    print(f"Estimation lignes rejetées         : {approx_error + approx_ridicule}")
 
-generate_log_file("log_long.txt")
-print("Generated file: log_long.txt")
+generate_log_file("log_long.txt", num_lines=100, normal_ratio=0.5)
+print("\n✅ Generated file : log_long.txt")
