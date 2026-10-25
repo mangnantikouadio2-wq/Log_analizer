@@ -1,7 +1,7 @@
 import random
 
-STRUCTURAL_ERRORS = {'malformed_line', 'missing_fiels'}
-DATA_ERRORS = {'incorect_ip', 'invalid_timestamp', 'invalid_method',
+STRUCTURAL_ERRORS = {'malformed_line', 'missing_fields'}
+DATA_ERRORS = {'incorrect_ip', 'invalid_timestamp', 'invalid_method',
                'invalid_url', 'invalid_status_code'}
 
 def normal_line(x):
