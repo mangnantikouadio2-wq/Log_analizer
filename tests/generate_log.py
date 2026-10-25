@@ -1,5 +1,9 @@
 import random
 
+STRUCTURAL_ERRORS = {'malformed_line', 'missing_fiels'}
+DATA_ERRORS = {'incorect_ip', 'invalid_timestamp', 'invalid_method',
+               'invalid_url', 'invalid_status_code'}
+
 def normal_line(x):
     x_ip = x % 256
     x_sec = x % 60
@@ -56,11 +60,10 @@ def generate_log_file(filename, num_lines=100, normal_ratio=0.5):
     stats = {
         'total': 0,
         'normal': 0,
-        'error': 0,
-        'ridicule': 0,
+        'accepted_warnings': 0,
+        'rejected_structural': 0,
+        'rejected_truncated': 0,
         'motifs': {m: 0 for m in motifs},
-        'error_lines': 0,
-        'ridicule_lines': 0,
     }
 
     with open(filename, 'w') as f:
@@ -75,37 +78,39 @@ def generate_log_file(filename, num_lines=100, normal_ratio=0.5):
                 if random.random() < 0.5:
                     motif = random.choice(motifs)
                     error_lines = error_line(i, motif)
+                    num_lines = len(error_lines)
                     for line in error_lines:
                         f.write(line + '\n')
-                    stats['error'] += 1
-                    stats['motifs'][motif] += 1
-                    stats['error_lines'] += len(error_lines)
-                    stats['total'] += len(error_lines)
+                    stats['total'] += num_lines
+                    stats['motifs'][motif] += num_lines
+                    if motif in STRUCTURAL_ERRORS:
+                        stats['rejected_structural'] += num_lines
+                    else:
+                        stats['accepted_warnings'] += num_lines
                 else:
                     ridicule_lines_list = ridicule_lines(i)
+                    num_lines = len(ridicule_lines_list)
                     for line in ridicule_lines_list:
                         f.write(line + '\n')
-                    stats['ridicule'] += 1
-                    stats['ridicule_lines'] += len(ridicule_lines_list)
-                    stats['total'] += len(ridicule_lines_list)
+                    stats['total'] += num_lines
+                    stats['rejected_truncated'] += num_lines
         last_line = '192.168.1.18 - - [13/Oct/2026:10:42:08 +0000] "GET /end HTTP/1.1" 200 700'
         f.write(last_line)
+        stats['normal'] += 1
         stats['total'] += 1
     print(f"=== Génération de {filename} ===")
-    print(f"Lignes totales       : {stats['total']}")
-    print(f"  ├─ Normales        : {stats['normal']} (blocs)")
-    print(f"  ├─ Erreurs         : {stats['error']} (blocs → {stats['error_lines']} lignes)")
-    print(f"  ├─ Ridicules       : {stats['ridicule']} (blocs → {stats['ridicule_lines']} lignes)")
-    print(f"  └─ Dernière ligne  : 1 (sans \\n)")
-    print(f"\nDétail des motifs d'erreur :")
-    for m, count in stats['motifs'].items():
-        if count > 0:
-            print(f"  {m:20s} : {count} bloc(s)")
-    approx_normal = stats['normal']
-    approx_error = stats['error_lines']
-    approx_ridicule = stats['ridicule_lines']
-    print(f"\nEstimation lignes valides (normal) : {approx_normal}")
-    print(f"Estimation lignes rejetées         : {approx_error + approx_ridicule}")
+    print(f"Lignes totales          : {stats['total']}")
+    print(f"  ├─ OK                 : {stats['normal']}")
+    print(f"  ├─ Accepted [WARNING]: {stats['accepted_warnings']}")
+    print(f"  ├─ Rejeted (incorrect structure): {stats['rejected_structural']}")
+    print(f"  └─ Rejeted (truncated): {stats['rejected_truncated']}")
+    s = (stats['normal'] + stats['accepted_warnings'] +
+         stats['rejected_structural'] + stats['rejected_truncated'])
+    assert s == stats['total'], f"BUG: {s} != {stats['total']}"
+    print(f"\nMotifs details :")
+    for m, c in stats['motifs'].items():
+        if c > 0:
+            print(f"  {m:22s} : {c} line(s)")
 
 generate_log_file("log_long.txt", num_lines=100, normal_ratio=0.5)
 print("\n✅ Generated file : log_long.txt")
