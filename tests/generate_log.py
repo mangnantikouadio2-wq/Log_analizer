@@ -93,7 +93,8 @@ def generate_log_file(filename, num_lines=100, normal_ratio=0.5):
                     for line in ridicule_lines_list:
                         f.write(line + '\n')
                     stats['total'] += num_lines
-                    stats['rejected_truncated'] += num_lines
+                    stats['rejected_truncated'] += 2
+                    stats['rejected_structural'] += 1
         last_line = '192.168.1.18 - - [13/Oct/2026:10:42:08 +0000] "GET /end HTTP/1.1" 200 700'
         f.write(last_line)
         stats['normal'] += 1
