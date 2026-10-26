@@ -11,11 +11,13 @@ MAIN_OBJ = src/main.o
 
 TEST_PARSER_OBJ = tests/test_parser.o
 TEST_VALIDATOR_OBJ = tests/test_validator.o
+TEST_STATS_OBJ = tests/test_statistics.o
 
 TEST_PARSER = run_parser
 TEST_VALIDATOR = run_validator
+TEST_STATS = run_statistics
 
-.PHONY: all clean run test1 test2
+.PHONY: all clean run test1 test2 test3
 
 all: $(TARGET)
 
@@ -34,11 +36,17 @@ $(TEST_PARSER): $(OBJS) $(VAL_OBJ) $(TEST_PARSER_OBJ)
 $(TEST_VALIDATOR): $(VAL_OBJ) $(TEST_VALIDATOR_OBJ)
 	$(CC) $(FLAGS) $^ -o $@
 
+$(TEST_STATS): $(OBJS) $(VAL_OBJ) $(TEST_STATS_OBJ)
+	$(CC) $(FLAGS) $^-o $@
+
 test1: $(TEST_PARSER)
 	./$(TEST_PARSER)
 
 test2: $(TEST_VALIDATOR)
 	./$(TEST_VALIDATOR)
+
+test3: $(TEST_STATS)
+	./$(TEST_STATS)
 
 clean:
 	rm -f $(OBJS) $(VAL_OBJ) $(MAIN_OBJ)
@@ -48,4 +56,4 @@ clean:
 	rm -f $(TARGET) $(TEST_PARSER) $(TEST_VALIDATOR)
 
 -include $(OBJS:.o=.d) $(VAL_OBJ:.o=.d) $(MAIN_OBJ:.o=.d)
--include $(TEST_PARSER_OBJ:.o=.d) $(TEST_VALIDATOR_OBJ:.o=.d)
+-include $(TEST_PARSER_OBJ:.o=.d) $(TEST_VALIDATOR_OBJ:.o=.d) $(TEST_STATS_OBJ:.o=.d)
