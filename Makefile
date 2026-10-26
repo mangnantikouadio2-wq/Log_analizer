@@ -2,7 +2,7 @@ CC = gcc
 FLAGS = -Wall -Wextra -std=c11 -Isrc -MMD -MP
 TARGET = parser
 
-LIB_SRC = src/gettoken.c src/parser.c src/reader.c
+LIB_SRC = src/gettoken.c src/parser.c src/reader.c src/statistics.c
 VAL_SRC = src/validator.c
 
 OBJS = $(LIB_SRC:.c=.o)
@@ -37,7 +37,7 @@ $(TEST_VALIDATOR): $(VAL_OBJ) $(TEST_VALIDATOR_OBJ)
 	$(CC) $(FLAGS) $^ -o $@
 
 $(TEST_STATS): $(OBJS) $(VAL_OBJ) $(TEST_STATS_OBJ)
-	$(CC) $(FLAGS) $^-o $@
+	$(CC) $(FLAGS) $^ -o $@
 
 test1: $(TEST_PARSER)
 	./$(TEST_PARSER)
@@ -50,10 +50,10 @@ test3: $(TEST_STATS)
 
 clean:
 	rm -f $(OBJS) $(VAL_OBJ) $(MAIN_OBJ)
-	rm -f $(TEST_PARSER_OBJ) $(TEST_VALIDATOR_OBJ)
+	rm -f $(TEST_PARSER_OBJ) $(TEST_VALIDATOR_OBJ) $(TEST_STATS_OBJ)
 	rm -f $(OBJS:.o=.d) $(VAL_OBJ:.o=.d) $(MAIN_OBJ:.o=.d)
-	rm -f $(TEST_PARSER_OBJ:.o=.d) $(TEST_VALIDATOR_OBJ:.o=.d)
-	rm -f $(TARGET) $(TEST_PARSER) $(TEST_VALIDATOR)
+	rm -f $(TEST_PARSER_OBJ:.o=.d) $(TEST_VALIDATOR_OBJ:.o=.d) $(TEST_STATS_OBJ:.o=.d)
+	rm -f $(TARGET) $(TEST_PARSER) $(TEST_VALIDATOR) $(TEST_STATS)
 
 -include $(OBJS:.o=.d) $(VAL_OBJ:.o=.d) $(MAIN_OBJ:.o=.d)
 -include $(TEST_PARSER_OBJ:.o=.d) $(TEST_VALIDATOR_OBJ:.o=.d) $(TEST_STATS_OBJ:.o=.d)
