@@ -1,6 +1,7 @@
 #ifndef STATISTICS_H
 #define STATISTICS_H
 
+#include <string.h>
 #include "parser.h"
 
 #define MAX_STATUS 600
@@ -33,9 +34,10 @@ typedef struct {
 
 void stats_init(Stats *s);
 void stats_record_parse_result(const int result, Stats *s);
+int compare_ips(const void *ip_a, const void *ip_b);
 void stats_update(Stats *s, const LogEntity *entry, int result);
 
-void display_top_N_ips(const Stats *s, const int N);
+void display_top_N_ips(const Stats *s, size_t N);
 void display_stats(const Stats *s);
 void display_verbose_output(LogEntity current_entry, int line_count, int result);
 

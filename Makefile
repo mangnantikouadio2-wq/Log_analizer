@@ -1,8 +1,8 @@
 CC = gcc
 FLAGS = -Wall -Wextra -std=c11 -Isrc -MMD -MP
-TARGET = parser
+TARGET = loganalyzer
 
-LIB_SRC = src/gettoken.c src/parser.c src/reader.c src/statistics.c
+LIB_SRC = src/gettoken.c src/parser.c src/reader.c src/statistics.c src/report.c
 VAL_SRC = src/validator.c
 
 OBJS = $(LIB_SRC:.c=.o)

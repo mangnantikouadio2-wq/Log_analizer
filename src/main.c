@@ -1,108 +1,80 @@
 #include <stdio.h>
-#include "parser.h"
-#include "validator.h"
-
-enum {is_weird, is_safe};
+#include <stdlib.h>
+#include <string.h>
+//#include <ctype.h>
+#include "statistics.h"
 
 int main(int argc, char *argv[]) {
-    char *file_name = (argc > 1) ? argv[1] : "log.txt";
-    FILE *fp = fopen(file_name, "r");
-    if (!fp) {
-        printf("OPENING ERROR\n");
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <file> [--verbose] [--stats] [--top-ips N]\n", argv[0]);
         return 1;
     }
-    int line_count = 1;
-    int line_state;
+    char *file_name = argv[1];
+    int do_verbose = 0;
+    int do_stats = 0;
+    int do_top = 0;
+    int top_n = 10;
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--verbose") == 0) {
+            do_verbose = 1;
+        } else if (strcmp(argv[i], "--stats") == 0) {
+            do_stats = 1;
+        } else if (strcmp(argv[i], "--top-ips") == 0) {
+            if (i + 1 >= argc) {
+                fprintf(stderr, "Critical : expected a positive number!\n");
+                return 1;
+            }
+            top_n = atoi(argv[++i]);
+            if (top_n <= 0) {
+                fprintf(stderr, "Error : the desired ip number must be positive\n");
+                return 1;
+            }
+            do_top = 1;
+        } else {
+            fprintf(stderr, "Error : Unknown option '%s'\n", argv[i]);
+            return 1;
+        }
+    }
+
+    FILE *fp = fopen(file_name, "r");
+    if (!fp) {
+        perror("Opening error");
+        return 1;
+    }
+    Stats stats;
+    stats_init(&stats);
     char line_buffer[BUFFER_SIZE];
     LogEntity current_entry;
-    while(1) {
+    int line_count = 1;
+    while (1) {
         char *line = get_line(fp, line_buffer, sizeof(line_buffer));
         if (line == NULL) {
-            if (feof(fp)) {
+            if (feof(fp)){ 
                 break;
             }
-            printf("Line %d : The line is too long -> [REJECTED]!\n", line_count);
+            stats.total_lines++;
+            if (do_verbose) {
+                printf("Line %d : The line is too long -> [REJECTED]!\n", line_count);
+            }
+            line_count++;
             continue;
         }
-        line_state = is_safe;
-        printf("Line %d : ", line_count);
         int result = parse_line(line_buffer, &current_entry);
-        if (result == 1) {
-            if (validate_ip(current_entry.ip)) {
-                printf("IP=%s | ", current_entry.ip);
-            } else {
-                printf("[INVALID IP: \"%s\"] | ", current_entry.ip);
-                line_state = is_weird;
-            }
-            if (validate_timestamp(current_entry.timestamp)) {
-                printf("TIMESTAMP=%s | ", current_entry.timestamp);
-            } else {
-                printf("[INVALID TIMESTAMP: \"%s\"] | ", current_entry.timestamp);
-                line_state = is_weird;
-            }
-            if (validate_time_zone(current_entry.time_zone)) {
-                printf("TIMEZONE=%s | ", current_entry.time_zone);
-            } else {
-                printf("[INVALID TIMEZONE: \"%s\"] | ", current_entry.time_zone);
-                line_state = is_weird;
-            }
-            if (validate_method(current_entry.req.method)) {
-                printf("METHOD=%s | ", current_entry.req.method);
-            } else {
-                printf("[INVALID METHOD: \"%s\"] | ", current_entry.req.method);
-                line_state = is_weird;
-            }
-            if (validate_url(current_entry.req.url)) {
-                printf("URL=%s | ", current_entry.req.url);
-            } else {
-                printf("[INVALID URL: \"%s\"] | ", current_entry.req.url);
-                line_state = is_weird;
-            }
-            if (validate_version(current_entry.req.http_version)) {
-                printf("HTTP_VERSION=%s | ", current_entry.req.http_version);
-            } else {
-                printf("[INVALID HTTP_VERSION: \"%s\"] | ", current_entry.req.http_version);
-                line_state = is_weird;
-            }
-            if (validate_status(current_entry.status)) {
-                printf("STATUS=%s | ", current_entry.status);
-            } else {
-                printf("[INVALID STATUS: \"%s\"] | ", current_entry.status);
-                line_state = is_weird;
-            }
-            printf("RESPONSE_BYTES=%lu ", current_entry.response_bytes);
-            switch (line_state) {
-            case is_weird:
-                printf("-> [WARNING]\n");
-                break;
-            
-            default:
-                printf("-> [OK]\n");
-                break;
-            }
-        } else if (result == 0) {
-            printf("INVALID LINE: BROKEN LINE STRUCTURE -> [REJECTED]!\n");
-        } else if (result == MISSING_BRACKET) {
-            printf("INVALID LINE: MISSING_BRACKET -> [REJECTED]!\n");
-        } else if (result == MISSING_QUOTE) {
-            printf("INVALID LINE: MISSING QUOTE -> [REJECTED]!\n");
-        } else if (result == TOO_LONG_URL) {
-            printf("INVALID LINE: TOO LONG URL -> [REJECTED]!\n");
-        } else if (result == MISSING_IP) {
-            printf("INVALID LINE: MISSING IP -> [REJECTED]!\n");
-        } else if (result == MISSING_METHOD) {
-            printf("INVALID LINE: MISSING METHOD -> [REJECTED]!\n");
-        } else if (result == MISSING_RESPONSE_SIZE) {
-            printf("INVALID LINE: MISSING RESPONSE SIZE -> [REJECTED]!\n");
-        } else if (result == MISSING_TIMESTAMP) {
-            printf("INVALID LINE: MISSING TIMESTAMP -> [REJECTED]!\n");
-        } else if (result == MISSING_TIMEZONE) {
-            printf("INVALID LINE: MISSING TIME ZONE -> [REJECTED]!\n");
-        } else if (result == MISSING_VERSION) {
-            printf("INVALID LINE: MISSING VERSION -> [REJECTED]!\n");
+        stats_record_parse_result(result, &stats);
+        stats_update(&stats, &current_entry, result);
+        if (do_verbose) {
+            display_verbose_output(current_entry, line_count, result);
         }
         line_count++;
     }
     fclose(fp);
+    if (do_stats) {
+        qsort(stats.IPs.IpTable, stats.IPs.n_ips, sizeof(IP_count), compare_ips);
+        display_stats(&stats);
+    }
+    if (do_top) {
+        qsort(stats.IPs.IpTable, stats.IPs.n_ips, sizeof(IP_count), compare_ips);
+        display_top_N_ips(&stats, top_n);
+    }
     return 0;
 }

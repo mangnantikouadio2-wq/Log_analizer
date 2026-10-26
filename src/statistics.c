@@ -64,7 +64,7 @@ static void ip_increment(IP_Table *t, const char *ip) {
     }
 }
 
-static int compare_ips(const void *ip_a, const void *ip_b) {
+int compare_ips(const void *ip_a, const void *ip_b) {
     const IP_count *count_a = (const IP_count *)ip_a;
     const IP_count *count_b = (const IP_count *)ip_b;
     if (count_a->count < count_b->count) {
