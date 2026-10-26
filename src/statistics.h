@@ -35,4 +35,8 @@ void stats_init(Stats *s);
 void stats_record_parse_result(const int result, Stats *s);
 void stats_update(Stats *s, const LogEntity *entry, int result);
 
+void display_top_N_ips(const Stats *s, const int N);
+void display_stats(const Stats *s);
+void display_verbose_output(LogEntity current_entry, int line_count, int result);
+
 #endif
