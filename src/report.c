@@ -3,8 +3,8 @@
 
 enum {is_weird, is_safe};
 
-void display_top_N_ips(const Stats *s, const int N) {
-    printf("==== Top %d IPs ====\n", N);
+void display_top_N_ips(const Stats *s, size_t N) {
+    printf("==== Top %ld IPs ====\n", N);
     for (size_t i = 0; i < N && i < s->IPs.n_ips; i++) {
         printf("%s : %lu requests\n", s->IPs.IpTable[i].ip, s->IPs.IpTable[i].count);
     }
