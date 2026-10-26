@@ -31,22 +31,22 @@ static void classyfy_status(const char *status, Stats *s) {
 
 static void count_methods(const char *method, Stats *s) {
     if (strcmp(method, "GET") == 0) s->n_GET++;
-    if (strcmp(method, "POST")== 0) s->n_POST++;
-    if (strcmp(method, "PUT") == 0) s->n_PUT++;
-    if (strcmp(method, "DELETE")== 0) s->n_DELETE++;
-    if (strcmp(method, "HEAD")== 0) s->n_HEAD++;
-    if (strcmp(method, "OPTIONS")== 0) s->n_OPTIONS++;
-    if (strcmp(method, "PATCH")== 0) s->n_PATCH++;
-    if (strcmp(method, "CONNECT")== 0) s->n_CONNECT++;
-    if (strcmp(method, "TRACE")== 0) s->n_TRACE++;
-    if (strcmp(method, "PROPFIND")== 0) s->n_PROPFIND++;
-    if (strcmp(method, "MKCOL") == 0) s->n_MKCOL++;
-    if (strcmp(method, "COPY")  == 0) s->n_COPY++;
-    if (strcmp(method, "MOVE")  == 0) s->n_MOVE++;
-    if (strcmp(method, "LOCK")  == 0) s->n_LOCK++;
-    if (strcmp(method, "UNLOCK")== 0) s->n_UNLOCK++;
-    if (strcmp(method, "PLAY")  == 0) s->n_PLAY++;
-    if (strcmp(method, "PAUSE") == 0) s->n_PAUSE++;
+    else if (strcmp(method, "POST")== 0) s->n_POST++;
+    else if (strcmp(method, "PUT") == 0) s->n_PUT++;
+    else if (strcmp(method, "DELETE") == 0) s->n_DELETE++;
+    else if (strcmp(method, "HEAD")   == 0) s->n_HEAD++;
+    else if (strcmp(method, "OPTIONS")== 0) s->n_OPTIONS++;
+    else if (strcmp(method, "PATCH")  == 0) s->n_PATCH++;
+    else if (strcmp(method, "CONNECT")== 0) s->n_CONNECT++;
+    else if (strcmp(method, "TRACE")  == 0) s->n_TRACE++;
+    else if (strcmp(method, "PROPFIND")== 0) s->n_PROPFIND++;
+    else if (strcmp(method, "MKCOL") == 0) s->n_MKCOL++;
+    else if (strcmp(method, "COPY")  == 0) s->n_COPY++;
+    else if (strcmp(method, "MOVE")  == 0) s->n_MOVE++;
+    else if (strcmp(method, "LOCK")  == 0) s->n_LOCK++;
+    else if (strcmp(method, "UNLOCK")== 0) s->n_UNLOCK++;
+    else if (strcmp(method, "PLAY")  == 0) s->n_PLAY++;
+    else if (strcmp(method, "PAUSE") == 0) s->n_PAUSE++;
     else s->n_other_method++;
 }
 
