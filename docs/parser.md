@@ -43,14 +43,14 @@ Implemented:
 - Field validation
 - Human-redable reporting
 - Basic warning/rejection categories
+- Total request count
+- Status-class statistics
+- Most active IPs
 
 Not yet implemented:
 
-- Total request count
-- Status-class statistics
 - Method statistics
 - IP frequency
-- Most active IPs
 - Time buckets
 - Brute-force detection
 - SQL injection/XSS detection
@@ -60,8 +60,52 @@ Not yet implemented:
 
 So the project is currently:
 
-> A streaming log parser and validator with a CLI demonstration.
+> A CLI log-Analisys.
 
 It is not yet:
 
-> A log-Analisys and anomaly detection system.
+> An anomaly detection system.
+
+## How the main program works
+
+The current program accept a log file and report options as inputs. It parses the log file to display the informations
+required by the user. It does it by reading the file line by line and apply the parsing algorithm to each single line.
+The parsing algorithm works on the line by using a pointer to deference each element of the character array and
+passing the appropriate position pointer to subsequents functions to get the items we want from the line. After
+the function is done working, the parser algorithm advance the pointer to the next camp to be handled by another
+function and so on.<br />
+The usefull information are all represented by a structure of character arrays(IP, TIMESTAMP, METHOD, URL and
+STATUS) called `Log_entity`. The parsing algorithm feed all the members of this structure the appropriate information
+while parsing the data.<br />
+After the parsing algorith finishes his work, all the fields of the structure are verified
+by the fuctions in `validator.c`. If the verification is successful, the informations are displayed and the line is
+given the status `[OK]` but if it is not, the incorrect information is reported as invalid and the line is given the
+the status `[WARNING]` for the `--verbose` option. If the line format does not match the format accepted by the parser
+or is someway corrupted, the line is reported as `[REJECTED!]` and the purpose of rejection is given.<br />
+If the option `--stats` is selected, the algorithm parses each lines in a Log_entity and each Log_entity is given to`statistics.c`.
+The functions contained in it extract information like the occurence of each ip or each methods or
+each status. After this, the statistics are printed on the terminal. The output follows:
+
+```text
+=== Statistics ===
+Read lines       : x
+Valid lines      : y
+Rejected lines   : z
+
+2xx (succes)     : n
+3xx (redirects)  : t
+4xx (cli errors) : k
+5xx (srv errors) : p
+Other status code: m
+
+Top 10 IPs
+xxx.xxx.xxx.xxx : n requests
+ .
+ .
+ .
+```
+
+<br />
+
+If the option `--top-ips` is selected, the program will exept an positive number after this option. The number povided
+of most actives ips will be printed on the screen.

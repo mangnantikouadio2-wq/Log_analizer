@@ -1,15 +1,17 @@
 # Log analyzer program
 
-The repo is actually a log paser that accept lines in format `IP - - [TIMESTAMP TIME-ZONE] "METHOD URL HTTP-VERSION" STATUT OCTETS`.
-My goal is to progressively build a log-analysis and security-detection tool from the current working parser into a complete,
-modular CLI application.
+A lightweigt and fast HTTP log analyzer, written in C.<br />
+It parses logs in the following format: `IP - - [TIMESTAMP TIME-ZONE] "METHOD URL HTTP-VERSION" STATUT OCTETS`(the Apache/Ngix format),
+validates their structure and data, and generates detailed traffic statistics.
 
 ## Features
 
 - Accept a log file as input
-- Parse each lines
-- Validate each parsed entry
-- Handle invalid inputs
+- Robust parsing (strict validation of IPs, timestamps, methods, etc.)
+- Resilient to corrupted or excessively long lines (no crashes).
+- Statistics by HTTP status code (2xx, 3xx, etc.).
+- Ranking of the most active IPs (Top N).
+- Terminal-based interface.
 - Report the result in a verbose way
 
 ## Project structure
@@ -27,51 +29,40 @@ log_analizer/
 │   ├── parser.c
 │   ├── parser.h
 │   ├── reader.c
+│   ├── report.c
+│   ├── statistics.c
+│   ├── statistics.h
 │   ├── validator.c
 │   └── validator.h
 ├── tests
+│   ├── generate_log.py
 │   ├── test_log.txt
 │   ├── test_parser.c
+│   ├── test_statistics.c
 │   └── test_validator.c
 └── todo.md
 ```
 
-## How it works
-
-The current program accept a log file as an input and parse it to display the importants componants
-of the lines. It does it by reading the file line by line and apply the parsing algorith! to each single line.
-The parsing algorithm works on the line by using a pointer to deference each element of the character array and
-passing the appropriate position pointer to subsequents functions to get the items we want from the line. After
-the function is done working, the parser algorithm advance the pointer to the next camp to be handled by another
-function and so on.
-The usefull information are all represented by a structure of character arrays(IP, TIMESTAMP, METHOD, URL and
-STATUS) called `Log_entity`. The parsing algorithm feed all the members of this structure the appropriate information
-while parsing the data. After the parsing algorith finishes his work, all the fields of the structure are verified
-by the fuctions in `validator.c`. If the verification is successful, the informations are displayed and the line is
-given the status `[OK]` but if it is not, the incorrect information is reported as invalid and the line is given the
-the status `[WARNING]`. If the line format does not match the format accepted by the parser or is someway corrupted(
-we assumed here corruption as missing brackets or missing quotes), the line is reported as corrupted.
-
 ## How to use
 
-You can simply open a terminal in the project file directory an write `make run`. This will compile the file
-whith the appropriate dependances. After that you can provide your own log file you may want to parse by typing
-`./parser [you_log_file]`. <br />
+Clone the repository first:
+
+```text
+git clone git@github.com:mangnantikouadio2-wq/Log_analizer.git
+cd Log_analizer
+```
+
+Then compile the program: `make` and use it with the following syntax `./loganalyzer <file> [--verbose] [--stats] [--top-ips N]`.
+Replace `<file>` by your log file name an choose the report option(s) you want.
+
 To do tests, you can run the command `make test1 && make test2` or whatever test you want to do.
 
 ## Future improvements
 
 ### Basic statistics
 
-- Count total requests
-- Count successfull requests
-- Count client errors
-- Count server errors
 - Count requests by HTTP method
-- Count requests by status code
 - Count requests by IP address
-- Determine most active IPs
-- Display some "top" IPs(did not decided yet how many)
 
 ### Time Analysis
 
